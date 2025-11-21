@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GAN Cube 3D Visualizer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="controls">
+      <h1>GAN Cube 3D Visualizer</h1>
+      <div class="input-group" style="margin-bottom: 15px;">
+        <label for="macInput" style="display: block; margin-bottom: 5px; font-size: 14px; color: #555;">Cube MAC Address (Optional):</label>
+        <input type="text" id="macInput" placeholder="AA:BB:CC:DD:EE:FF" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        <small style="display: block; margin-top: 4px; color: #666; font-size: 12px;">Required for some cubes. Use "nRF Connect" app on phone to find it.</small>
+      </div>
+      <button id="connectBtn">Connect to GAN Cube</button>
+      <button id="debugBtn" style="background: #4a5568; margin-top: 5px;">Debug Connection</button>
+      <div id="status">Not connected</div>
+      <div id="moveLog"></div>
+    </div>
+    <div id="canvas-container"></div>
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
