@@ -17,6 +17,7 @@ export class RubiksCube {
     this.pieces = [];
     this.isAnimating = false;
     this.animationQueue = [];
+    this.animationFrameId = null;
     
     this.createCube();
     this.scene.add(this.cubeGroup);
@@ -87,6 +88,7 @@ export class RubiksCube {
 
   // Queue a move for animation
   queueMove(moveStr) {
+    // console.log('Queueing move:', moveStr);
     this.animationQueue.push(moveStr);
     if (!this.isAnimating) {
       this.processNextMove();
@@ -141,8 +143,9 @@ export class RubiksCube {
         rotationGroup.setRotationFromAxisAngle(axis, currentAngle);
         
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          this.animationFrameId = requestAnimationFrame(animate);
         } else {
+          this.animationFrameId = null;
           // Finalize rotation
           rotationGroup.setRotationFromAxisAngle(axis, angle);
           rotationGroup.updateMatrixWorld(); // Ensure transforms are up to date
@@ -228,14 +231,20 @@ export class RubiksCube {
   }
 
   reset() {
+    // Stop animation loop
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
     // Clear animation queue
     this.animationQueue = [];
     this.isAnimating = false;
     
-    // Remove all pieces
-    this.pieces.forEach(piece => {
-      this.cubeGroup.remove(piece);
-    });
+    // Remove all children (pieces and any active rotationGroup)
+    while (this.cubeGroup.children.length > 0) {
+      this.cubeGroup.remove(this.cubeGroup.children[0]);
+    }
     this.pieces = [];
     
     // Recreate cube

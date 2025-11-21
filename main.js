@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { connectGanCube } from 'gan-web-bluetooth';
 import { RubiksCube } from './cube.js';
+import { JumpingMonkey } from './monkey.js';
 
 // Three.js scene setup
-let scene, camera, renderer, cube;
+let scene, camera, renderer, cube, monkey;
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
 
@@ -42,8 +43,13 @@ function initThreeJS() {
   directionalLight2.position.set(-5, 5, -5);
   scene.add(directionalLight2);
   
-  // Create Rubik's Cube
+  // Create Objects
+  monkey = new JumpingMonkey(scene);
   cube = new RubiksCube(scene);
+  
+  // Initial State: Show Monkey, Hide Cube
+  cube.cubeGroup.visible = false;
+  monkey.show();
   
   // Mouse controls
   setupMouseControls(container);
@@ -120,8 +126,12 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
   
-  // Gentle auto-rotation when not dragging
-  if (!isDragging && !cube.isAnimating) {
+  if (monkey && monkey.group.visible) {
+    monkey.animate();
+  }
+
+  // Gentle auto-rotation when not dragging and cube is visible
+  if (cube && cube.cubeGroup.visible && !isDragging && !cube.isAnimating) {
     cube.cubeGroup.rotation.y += 0.001;
   }
   
@@ -211,11 +221,15 @@ async function connectToGanCube() {
       throw new Error('Web Bluetooth is not available. Please use Chrome, Edge, or Opera.');
     }
     
-    // Connect to GAN cube
-    statusEl.textContent = 'Connecting to cube...';
-    
     const macInput = document.getElementById('macInput');
     const manualMac = macInput.value.trim();
+
+    if (!manualMac) {
+      throw new Error('MAC Address is required. Please enter it above.');
+    }
+
+    // Connect to GAN cube
+    statusEl.textContent = 'Connecting to cube...';
     
     const macProvider = async (device) => {
       if (manualMac) {
@@ -232,12 +246,18 @@ async function connectToGanCube() {
     connectBtn.textContent = 'Disconnect';
     connectBtn.disabled = false;
     
-    // Request initial cube state
-    await ganConnection.sendCubeCommand({ type: "REQUEST_FACELETS" });
+    // Switch visualization
+    monkey.hide();
+    cube.cubeGroup.visible = true;
     
     // Subscribe to cube events
+    let isStateSynced = false;
     ganConnection.events$.subscribe((event) => {
       if (event.type === "MOVE") {
+        if (!isStateSynced) {
+          console.log("Ignoring move before sync:", event.move);
+          return;
+        }
         console.log("Cube move:", event.move);
         
         // Add move to log
@@ -256,6 +276,7 @@ async function connectToGanCube() {
       } else if (event.type === "FACELETS") {
         console.log("Cube facelets state:", event.facelets);
         cube.setCubeState(event.facelets);
+        isStateSynced = true;
       } else if (event.type === "DISCONNECT") {
         statusEl.textContent = 'Cube disconnected';
         statusEl.className = 'error';
@@ -264,6 +285,9 @@ async function connectToGanCube() {
         ganConnection = null;
       }
     });
+
+    // Request initial cube state
+    await ganConnection.sendCubeCommand({ type: "REQUEST_FACELETS" });
     
   } catch (error) {
     console.error('Connection error:', error);
@@ -296,6 +320,10 @@ function disconnectFromGanCube() {
     statusEl.textContent = 'Disconnected';
     statusEl.className = '';
     connectBtn.textContent = 'Connect to GAN Cube';
+
+    // Switch visualization back
+    cube.cubeGroup.visible = false;
+    monkey.show();
   }
 }
 
