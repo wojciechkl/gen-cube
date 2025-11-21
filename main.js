@@ -255,6 +255,7 @@ async function connectToGanCube() {
         cube.queueMove(event.move);
       } else if (event.type === "FACELETS") {
         console.log("Cube facelets state:", event.facelets);
+        cube.setCubeState(event.facelets);
       } else if (event.type === "DISCONNECT") {
         statusEl.textContent = 'Cube disconnected';
         statusEl.className = 'error';
@@ -286,8 +287,7 @@ async function connectToGanCube() {
 
 function disconnectFromGanCube() {
   if (ganConnection) {
-    // Note: gan-web-bluetooth doesn't expose a disconnect method
-    // The connection will be managed by the browser
+    ganConnection.disconnect();
     ganConnection = null;
     
     const statusEl = document.getElementById('status');

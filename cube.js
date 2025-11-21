@@ -241,4 +241,58 @@ export class RubiksCube {
     // Recreate cube
     this.createCube();
   }
+
+  setCubeState(facelets) {
+    // Reset cube to solved state first to ensure pieces are in correct positions
+    this.reset();
+
+    // Map of facelets string indices to (x, y, z) and face index
+    // Face indices: 0:R, 1:L, 2:U, 3:D, 4:F, 5:B
+    const map = [
+      // U (0-8)
+      {x:-1,y:1,z:-1,f:2}, {x:0,y:1,z:-1,f:2}, {x:1,y:1,z:-1,f:2},
+      {x:-1,y:1,z:0,f:2},  {x:0,y:1,z:0,f:2},  {x:1,y:1,z:0,f:2},
+      {x:-1,y:1,z:1,f:2},  {x:0,y:1,z:1,f:2},  {x:1,y:1,z:1,f:2},
+      // R (9-17)
+      {x:1,y:1,z:1,f:0},   {x:1,y:1,z:0,f:0},  {x:1,y:1,z:-1,f:0},
+      {x:1,y:0,z:1,f:0},   {x:1,y:0,z:0,f:0},  {x:1,y:0,z:-1,f:0},
+      {x:1,y:-1,z:1,f:0},  {x:1,y:-1,z:0,f:0}, {x:1,y:-1,z:-1,f:0},
+      // F (18-26)
+      {x:-1,y:1,z:1,f:4},  {x:0,y:1,z:1,f:4},  {x:1,y:1,z:1,f:4},
+      {x:-1,y:0,z:1,f:4},  {x:0,y:0,z:1,f:4},  {x:1,y:0,z:1,f:4},
+      {x:-1,y:-1,z:1,f:4}, {x:0,y:-1,z:1,f:4}, {x:1,y:-1,z:1,f:4},
+      // D (27-35)
+      {x:-1,y:-1,z:1,f:3}, {x:0,y:-1,z:1,f:3}, {x:1,y:-1,z:1,f:3},
+      {x:-1,y:-1,z:0,f:3}, {x:0,y:-1,z:0,f:3}, {x:1,y:-1,z:0,f:3},
+      {x:-1,y:-1,z:-1,f:3},{x:0,y:-1,z:-1,f:3},{x:1,y:-1,z:-1,f:3},
+      // L (36-44)
+      {x:-1,y:1,z:-1,f:1}, {x:-1,y:1,z:0,f:1}, {x:-1,y:1,z:1,f:1},
+      {x:-1,y:0,z:-1,f:1}, {x:-1,y:0,z:0,f:1}, {x:-1,y:0,z:1,f:1},
+      {x:-1,y:-1,z:-1,f:1},{x:-1,y:-1,z:0,f:1},{x:-1,y:-1,z:1,f:1},
+      // B (45-53)
+      {x:1,y:1,z:-1,f:5},  {x:0,y:1,z:-1,f:5}, {x:-1,y:1,z:-1,f:5},
+      {x:1,y:0,z:-1,f:5},  {x:0,y:0,z:-1,f:5}, {x:-1,y:0,z:-1,f:5},
+      {x:1,y:-1,z:-1,f:5}, {x:0,y:-1,z:-1,f:5}, {x:-1,y:-1,z:-1,f:5}
+    ];
+
+    for (let i = 0; i < facelets.length; i++) {
+      const char = facelets[i];
+      const color = COLORS[char];
+      const info = map[i];
+      
+      if (info && color !== undefined) {
+        const piece = this.pieces.find(p => 
+          p.userData.x === info.x && 
+          p.userData.y === info.y && 
+          p.userData.z === info.z
+        );
+        
+        if (piece) {
+          piece.material[info.f].color.setHex(color);
+          // Ensure emissive is set correctly for black/colored faces
+          piece.material[info.f].emissive.setHex(color === 0x000000 ? 0x000000 : color);
+        }
+      }
+    }
+  }
 }
