@@ -118,3 +118,59 @@ h1 {
   width: 100%;
   height: 100%;
 }
+
+/* Mobile Portrait */
+@media (max-width: 768px) and (orientation: portrait) {
+  #app {
+    flex-direction: column;
+  }
+
+  #canvas-container {
+    order: 1;
+    width: 100%;
+    height: 50vh;
+    flex: none;
+    touch-action: none;
+  }
+
+  .controls {
+    order: 2;
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 20;
+  }
+
+  #moveLog {
+    max-height: none;
+  }
+}
+
+/* Mobile Landscape */
+@media (max-width: 900px) and (orientation: landscape) {
+  #app {
+    flex-direction: row;
+  }
+
+  #canvas-container {
+    order: 1;
+    width: 50%;
+    height: 100vh;
+    flex: none;
+    touch-action: none;
+  }
+
+  .controls {
+    order: 2;
+    width: 50%;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    z-index: 20;
+  }
+
+  #moveLog {
+    max-height: none;
+  }
+}

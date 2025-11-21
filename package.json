@@ -1,15 +1,19 @@
 {
   "name": "gan-cube-visualizer",
+  "homepage": "https://github.io/wojciechkl/gen-cube/",
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "gan-web-bluetooth": "^3.0.2",
+    "gh-pages": "^6.3.0",
     "rxjs": "^7.8.1",
     "three": "^0.169.0"
   },
