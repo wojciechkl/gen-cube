@@ -199,16 +199,19 @@ export class RubiksCube {
   getRotationAxis(face) {
     switch (face) {
       case 'U':
+        return new THREE.Vector3(0, -1, 0);
       case 'D':
       case 'E':
         return new THREE.Vector3(0, 1, 0);
       case 'R':
+        return new THREE.Vector3(-1, 0, 0);
       case 'L':
       case 'M':
         return new THREE.Vector3(1, 0, 0);
       case 'F':
-      case 'B':
       case 'S':
+        return new THREE.Vector3(0, 0, -1);
+      case 'B':
         return new THREE.Vector3(0, 0, 1);
       default:
         return new THREE.Vector3(0, 1, 0);
